@@ -1,0 +1,56 @@
+==== Churn Rate by InternetService ====
+Churn                   No        Yes
+InternetService                      
+DSL              81.040892  18.959108
+Fiber optic      58.107235  41.892765
+No               92.595020   7.404980
+
+==================================================
+
+==== Churn Rate by Contract ====
+Churn                  No        Yes
+Contract                            
+Month-to-month  57.290323  42.709677
+One year        88.730482  11.269518
+Two year        97.168142   2.831858
+
+==================================================
+
+==== Churn Rate by PlanChange ====
+Churn              No        Yes
+PlanChange                      
+Downgrade   76.664592  23.335408
+Same        37.947883  62.052117
+Upgrade     77.045101  22.954899
+
+==================================================
+
+==== Churn Rate by PaymentMethod ====
+Churn                             No        Yes
+PaymentMethod                                  
+Bank transfer (automatic)  83.290155  16.709845
+Credit card (automatic)    84.756899  15.243101
+Electronic check           54.714588  45.285412
+Mailed check               80.893300  19.106700
+
+==================================================
+
+==== Churn Rate by tenure ====
+Churn                     No        Yes
+TenureGroup                            
+1-year≤ & ≤3-year  73.894956  26.105044
+3-year>            87.938381  12.061619
+<1-year            51.715805  48.284195
+
+==================================================
+
+==== Churn Rate by Partner & Dependents ====
+Churn                      No        Yes
+Partner Dependents                      
+No      No          65.762195  34.237805
+        Yes         78.670360  21.329640
+Yes     No          74.591652  25.408348
+        Yes         85.763293  14.236707
+
+==================================================
+

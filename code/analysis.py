@@ -1,57 +1,64 @@
-import matplotlib.pyplot as plt
-import seaborn as sns
-from prepare import *
+import pandas as pd
+import ace_tools_open as tools
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report
 
-# 1) 부양가족 여부에 따른 이탈여부 Dependents - Churn
-class results1:
-    def __init__(self):
-        results1 = df.groupby('Dependents')['Churn'].mean()
-        plt.figure(figsize=(6, 4))
-        sns.barplot(x=['No', 'Yes'], y=results1.values, palette='Set2')
-        plt.title('Churn Rate by Dependents')
-        plt.xlabel('Dependents')
-        plt.ylabel('Churn Rate')
-        plt.savefig('../results/results1.png')
-        plt.show()
+df = pd.read_csv('../data/new_metadata.csv')
 
-# 2) 인터넷 서비스 사용 여부에 따른 이탈여부 InternetService - Churn
-class results2:
-    def __init__(self):
-        results2 = df.groupby('InternetService')['Churn'].mean()
-        plt.figure(figsize=(6, 4))
-        sns.barplot(x=['DSL', 'Fiber optic', 'No'], y=results2.values, palette='Set2')
-        plt.title('Churn Rate by InternetService')
-        plt.xlabel('InternetService')
-        plt.ylabel('Churn Rate')
-        plt.savefig('../results/results2.png')
-        plt.show()
-# 3) 사용기간 별 이탈 여부 tenure - Churn
-class results3:
-    def __init__(self):
-        tenure_threshold = df.tenure.median()
-        charge_threshold = df.MonthlyCharges.median()
+# InternetService별 이탈률
+rate_for_Internetservice = df.groupby('InternetService')['Churn'].value_counts(normalize=True).unstack() * 100
 
-        conditions = [
-            (df['tenure'] < tenure_threshold) & (df['MonthlyCharges'] < charge_threshold),
-            (df['tenure'] < tenure_threshold) & (df['MonthlyCharges'] >= charge_threshold),
-            (df['tenure'] >= tenure_threshold) & (df['MonthlyCharges'] < charge_threshold),
-            (df['tenure'] >= tenure_threshold) & (df['MonthlyCharges'] >= charge_threshold)
-        ]
+tools.display_dataframe_to_user(name='Churn Rate by InternetService', dataframe=rate_for_Internetservice)
+print()
 
-        labels = ['Short Tenure, Low Charge', 'Short Tenure, High Charge', 'Long Tenure, Low Charge', 'Long Tenure, High Charge']
+# Contract별 이탈률
+rate_for_Contract = df.groupby('Contract')['Churn'].value_counts(normalize=True).unstack() * 100
 
-        df['Tenure_Charge_Group'] = pd.cut(df['tenure'], bins=[-1, tenure_threshold, float('inf')], labels=['Short Tenure', 'Long Tenure'])
-        df['Charge_Group'] = pd.cut(df['MonthlyCharges'], bins=[-1, charge_threshold, float('inf')], labels=['Low Charge', 'High Charge'])
+tools.display_dataframe_to_user(name='Churn Rate by Contract', dataframe=rate_for_Contract)
+print()
 
-        churn_rate = df.groupby(['Tenure_Charge_Group', 'Charge_Group'])['Churn'].mean().reset_index()
+# PlanChange별 이탈률률
+rate_for_Planchange = df.groupby('PlanChange')['Churn'].value_counts(normalize=True).unstack() * 100
 
-        plt.figure(figsize=(10, 6))
-        sns.barplot(x='Tenure_Charge_Group', y='Churn', hue='Charge_Group', data=churn_rate, palette='Set2')
-        plt.title('Churn Rate by Tenure and Monthly Charges')
-        plt.xlabel('Tenure and Charge Groups')
-        plt.ylabel('Churn Rate')
-        plt.legend(title='Charge Group')
-        plt.savefig('../results/results3.png')
-        plt.show()
+tools.display_dataframe_to_user(name='Churn Rate by PlanChange', dataframe=rate_for_Planchange)
+print()
 
-results3()
+# PaymentMethod별 이탈률률
+rate_for_PaymentMethod = df.groupby('PaymentMethod')['Churn'].value_counts(normalize=True).unstack() * 100
+
+tools.display_dataframe_to_user(name='Churn Rate by PaymentMethod', dataframe=rate_for_PaymentMethod)
+print()
+
+# Tenure별 이탈률률
+rate_for_Tenure = df.groupby('TenureGroup')['Churn'].value_counts(normalize=True).unstack() * 100
+
+tools.display_dataframe_to_user(name='Churn Rate by Tenure', dataframe=rate_for_Tenure)
+print()
+
+# Partner & Dependents별 이탈률률
+rate_for_Partner_Dependents = df.groupby(['Partner', 'Dependents'])['Churn'].value_counts(normalize=True).unstack() * 100
+
+tools.display_dataframe_to_user(name='Churn Rate by Partner & Dependents', dataframe=rate_for_Partner_Dependents)
+print()
+
+# 데이터프레임 리스트
+df_list = [
+    ("Churn Rate by InternetService", rate_for_Internetservice),
+    ("Churn Rate by Contract", rate_for_Contract),
+    ("Churn Rate by PlanChange", rate_for_Planchange),
+    ("Churn Rate by PaymentMethod", rate_for_PaymentMethod),
+    ("Churn Rate by tenure", rate_for_Tenure),
+    ("Churn Rate by Partner & Dependents", rate_for_Partner_Dependents)
+]
+
+# 하나의 TXT 파일로 저장
+output_file = "../results/analysis.txt"
+
+with open(output_file, "w", encoding="utf-8") as f:
+    for title, df_category in df_list:
+        f.write(f"==== {title} ====\n")  # 섹션 제목 추가
+        f.write(df_category.to_string())  # DataFrame을 문자열로 변환 후 추가
+        f.write("\n\n" + "="*50 + "\n\n")  # 섹션 구분선 추가
+
+print(f"이탈률 분석 결과가 {output_file}에 저장되었습니다!")
